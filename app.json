@@ -1,26 +1,42 @@
 {
   "expo": {
-    "name": "IDC-Himnos",
-    "slug": "IDC-Himnos",
-    "version": "1.0.0",
+    "name": "IDCHimnos",
+    "slug": "IDCHimnos",
+    "version": "2.0.2",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "icon": "./assets/icon-01.png",
+    "userInterfaceStyle": "light", 
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#121838"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/36ed0ece-3cf9-487e-9bb8-fa4ddebf466b"
+    },
+    "build": {
+      "preview": {
+        "channel": "preview"
+      },
+      "production": {
+        "channel": "production"
+      }
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.iglesiadecristoenelgin.idchimnos",
+      "buildNumber": "2.0.2",
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
+      "package": "com.iglesiadecristoenelgin.idchimnos",
+      "versionCode": 5,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
@@ -28,6 +44,28 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "36ed0ece-3cf9-487e-9bb8-fa4ddebf466b"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+    "plugins": [
+      ["expo-build-properties",
+      {
+        "android": {
+          "compileSdkVersion": 33,
+          "targetSdkVersion": 33,
+          "buildToolsVersion": "33.0.0"
+        },
+        "ios": {
+          "deploymentTarget": "13.0"
+        }
+      }
+    ]
+    ]
   }
 }
