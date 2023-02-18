@@ -12,7 +12,7 @@
       "backgroundColor": "#121838"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0,
+      "fallbackToCacheTimeout": 3000,
       "url": "https://u.expo.dev/36ed0ece-3cf9-487e-9bb8-fa4ddebf466b"
     },
     "build": {

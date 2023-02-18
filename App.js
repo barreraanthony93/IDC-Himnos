@@ -164,11 +164,11 @@ export default class App extends Component {
             </Stack.Screen>
           </Stack.Navigator>
         </NavigationContainer>
-        <Player
+        {/* <Player
           {...this.props}
           {...this.state}
           updateState={this.updateState}
-        />
+        /> */}
       </>
     );
   }
