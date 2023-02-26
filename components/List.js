@@ -19,7 +19,9 @@ const List = ( props) => {
 
   return (
     <View>
-      <ScrollView>
+      <ScrollView contentContainerStyle={{
+        paddingBottom: 150
+      }}>
         {data && data.map((item, index) => (
          item.title && renderItem(item, index)
         ))}
@@ -37,9 +39,3 @@ const List = ( props) => {
 };
 
 export default List;
-
-// const styles = StyleSheet.create({
-//   text: {
-//     color: theme.colors.text,
-//   },
-// });

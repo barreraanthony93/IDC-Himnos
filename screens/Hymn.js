@@ -5,6 +5,8 @@ import {
   SafeAreaView,
   TouchableOpacity,
   ScrollView,
+  Platform,
+  StatusBar,
   ActivityIndicator,
 } from "react-native";
 import React, { useState, useEffect } from "react";
@@ -33,27 +35,27 @@ const Hymn = ({
   const [fontSizeAdjust, setfontSizeAdjust] = useState(20);
 
   useEffect(() => {
-    async function asyncFunction(){
-      const fontSize = await AsyncStorage.getItem('fontSize');  
-      if(fontSize !== null) {
+    async function asyncFunction() {
+      const fontSize = await AsyncStorage.getItem('fontSize');
+      if (fontSize !== null) {
         setfontSizeAdjust(parseInt(fontSize))
-      } 
+      }
     }
     asyncFunction()
 
-    return () => {}
+    return () => { }
   }, [])
-  
+
   const fontSizeChange = async (adjust) => {
     if (adjust) {
       if (fontSizeAdjust < 32) {
         setfontSizeAdjust(fontSizeAdjust + 2);
-        await AsyncStorage.setItem('fontSize', (fontSizeAdjust + 2).toString());        
+        await AsyncStorage.setItem('fontSize', (fontSizeAdjust + 2).toString());
       }
     } else {
       if (fontSizeAdjust > 12) {
         setfontSizeAdjust(fontSizeAdjust - 2);
-        await AsyncStorage.setItem('fontSize', (fontSizeAdjust - 2).toString());        
+        await AsyncStorage.setItem('fontSize', (fontSizeAdjust - 2).toString());
       }
     }
   };
@@ -61,61 +63,64 @@ const Hymn = ({
   const playAudio = () => {
     loadNewPlaybackInstance(params)
 
-    if(hymnPlaying == null) {
-        updateState({
-          playerVisible : !playerVisible,
-        })
-    
-    } 
+    if (hymnPlaying == null) {
+      updateState({
+        playerVisible: !playerVisible,
+      })
+
+    }
   }
 
   const renderPlayButton = () => {
 
-    if(loadingPlayer) {
-      return <ActivityIndicator size='small' color={theme.colors.text}/>
+    if (loadingPlayer) {
+      return <ActivityIndicator size='small' color={theme.colors.text} />
     }
-    else if (playerVisible && hymnPlaying){
-      if(hymnPlaying.number === number) {
-        return <PlayingBars/>
+    else if (playerVisible && hymnPlaying) {
+      if (hymnPlaying.number === number) {
+        return <PlayingBars />
       } else {
-        return <Feather name="play" color={theme.colors.text} size={18} /> 
+        return <Feather name="play" color={theme.colors.text} size={18} />
       }
     } else {
-      return  <Feather name="play" color={theme.colors.text} size={18} /> 
+      return <Feather name="play" color={theme.colors.text} size={18} />
     }
   }
 
   const buttonSize = 20
- 
+  const AndroidSafeArea = {
+    flex: 1,
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0
+  }
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={AndroidSafeArea}>
       <View style={styles.header}>
         <View style={styles.leftSide}>
-        <TouchableOpacity
-          style={theme.button}
-          onPress={() => navigation.goBack()}
+          <TouchableOpacity
+            style={theme.button}
+            onPress={() => navigation.goBack()}
           >
-          <>
-            <Feather name="arrow-left" color={theme.colors.text} size={buttonSize} />
-          </>
-        </TouchableOpacity>
-          </View>
+            <>
+              <Feather name="arrow-left" color={theme.colors.text} size={buttonSize} />
+            </>
+          </TouchableOpacity>
+        </View>
         <View style={styles.headerDetails}>
-        <Text style={[styles.text, styles.number]}>{number} </Text>
-        <Text adjustsFontSizeToFit numberOfLines={1} style={[styles.text, styles.title]}>{title}</Text>
+          <Text style={[styles.text, styles.number]}>{number} </Text>
+          <Text adjustsFontSizeToFit numberOfLines={1} style={[styles.text, styles.title]}>{title}</Text>
         </View>
         <View style={styles.buttons}>
           {audioStatus && <TouchableOpacity
             style={theme.button}
-            onPress={() =>[playAudio()]}
+            onPress={() => [playAudio()]}
           >
             {renderPlayButton()}
           </TouchableOpacity>}
-        
-          <FavButton favs={favs} number={number} updateState={updateState}/>
+
+          <FavButton favs={favs} number={number} updateState={updateState} />
         </View>
       </View>
-       <ScrollView
+      <ScrollView
         contentContainerStyle={{
           paddingBottom: 70,
         }}
@@ -132,18 +137,18 @@ const Hymn = ({
         </Text>
       </ScrollView>
       <View style={styles.fontButtons}>
-      <TouchableOpacity
-            style={theme.button}
-            onPress={() => fontSizeChange(true)}
-          >
-            <AntDesign name="plus" color={theme.colors.text} size={buttonSize} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={theme.button}
-            onPress={() => fontSizeChange(false)}
-          >
-            <AntDesign name="minus" color={theme.colors.text} size={buttonSize} />
-          </TouchableOpacity>
+        <TouchableOpacity
+          style={theme.button}
+          onPress={() => fontSizeChange(true)}
+        >
+          <AntDesign name="plus" color={theme.colors.text} size={buttonSize} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={theme.button}
+          onPress={() => fontSizeChange(false)}
+        >
+          <AntDesign name="minus" color={theme.colors.text} size={buttonSize} />
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -163,13 +168,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 20,
-    width:'70%'
+    width: '70%'
   },
-  leftSide:{
-    flexDirection:'row',
-    alignItems:'center',
+  leftSide: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  number :{
+  number: {
     fontSize: 18
   },
   title: {
@@ -178,16 +183,16 @@ const styles = StyleSheet.create({
   },
   buttons: {
     flexDirection: "row",
-    alignItems:'center',
-    flexDirection:'row'
+    alignItems: 'center',
+    flexDirection: 'row'
   },
-  fontButtons :{
-    position:'absolute',
+  fontButtons: {
+    position: 'absolute',
     flexDirection: 'row',
     bottom: '2%',
     right: '2%'
   },
- 
+
   text: {
     color: theme.colors.text,
     fontWeight: "700",

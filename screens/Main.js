@@ -1,4 +1,4 @@
-import { View, Text,ActivityIndicator,  SafeAreaView, Modal } from "react-native";
+import { View, Text,ActivityIndicator,Platform, StatusBar,  SafeAreaView, Modal } from "react-native";
 import React, { useState, useEffect } from "react";
 import List from "../components/List";
 import Header from "../components/Header";
@@ -16,6 +16,10 @@ const Main = ( props) => {
   const [fireData, setFireData] = useState(null)
   const [updated, setUpdated] = useState(true)
 
+  const AndroidSafeArea = {
+    flex: 1, 
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0
+  }
   useEffect(() => {
     const timer = setInterval(async () => {
       const update = await Updates.checkForUpdateAsync()
@@ -89,14 +93,13 @@ const Main = ( props) => {
       <ActivityIndicator color="white" size="large"/>
     </View>
     :
-    <SafeAreaView>
+    <SafeAreaView style={AndroidSafeArea}>
       <Header
         search={search}
         setSearch={setSearch}
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
       />
-      <Text>TEST</Text>
       <List
         {...props}
         data={searchData().length > 0 ?  searchData() : fireData}
@@ -108,7 +111,7 @@ const Main = ( props) => {
           data={fireData}
           setModalVisible={setModalVisible}
         />
-      </Modal>
+      </Modal> 
     </SafeAreaView>
   );
 };
