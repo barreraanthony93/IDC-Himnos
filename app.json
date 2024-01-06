@@ -5,7 +5,7 @@
     "version": "2.0.3",
     "orientation": "portrait",
     "icon": "./assets/icon-01.png",
-    "userInterfaceStyle": "light", 
+    "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -15,17 +15,7 @@
       "fallbackToCacheTimeout": 3000,
       "url": "https://u.expo.dev/36ed0ece-3cf9-487e-9bb8-fa4ddebf466b"
     },
-    "build": {
-      "preview": {
-        "channel": "preview"
-      },
-      "production": {
-        "channel": "production"
-      }
-    },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.iglesiadecristoenelgin.idchimnos",
@@ -54,18 +44,19 @@
       "policy": "sdkVersion"
     },
     "plugins": [
-      ["expo-build-properties",
-      {
-        "android": {
-          "compileSdkVersion": 33,
-          "targetSdkVersion": 33,
-          "buildToolsVersion": "33.0.0"
-        },
-        "ios": {
-          "deploymentTarget": "13.0"
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "compileSdkVersion": 33,
+            "targetSdkVersion": 33,
+            "buildToolsVersion": "33.0.0"
+          },
+          "ios": {
+            "deploymentTarget": "13.0"
+          }
         }
-      }
-    ]
+      ]
     ]
   }
 }

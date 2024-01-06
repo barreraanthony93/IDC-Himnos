@@ -1,4 +1,12 @@
-import { View, Text,ActivityIndicator,Platform, StatusBar,  SafeAreaView, Modal } from "react-native";
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  Platform,
+  StatusBar,
+  SafeAreaView,
+  Modal,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import List from "../components/List";
 import Header from "../components/Header";
@@ -7,92 +15,106 @@ import FavModal from "../components/FavModal";
 // import data from "../database/himnos.json";
 import { ref, onValue } from "firebase/database";
 import { database } from "../database/firebaseConfig";
-import * as Updates from 'expo-updates'; 
+import * as Updates from "expo-updates";
 
-
-const Main = ( props) => {
+const Main = (props) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [search, setSearch] = useState("");
-  const [fireData, setFireData] = useState(null)
-  const [updated, setUpdated] = useState(true)
+  const [fireData, setFireData] = useState(null);
+  const [updated, setUpdated] = useState(true);
 
   const AndroidSafeArea = {
-    flex: 1, 
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0
-  }
+    flex: 1,
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+  };
   useEffect(() => {
-    const timer = setInterval(async () => {
-      const update = await Updates.checkForUpdateAsync()
-      if(update.isAvailable) { 
-        setUpdated(false)
-        await Updates.fetchUpdateAsync();
-        await Updates.reloadAsync(); 
-        setUpdated(true)
-
-      }
-    }, 3000)
-    return () => clearInterval(timer)
-}, [])
-
-  useEffect(() => {
-    onValue(ref(database, 'IDCHimnos/himnos'), (snapshot) => {
-      const data = snapshot.val()
-      setFireData(data)
-    })
-    
-    return () => {
-      
+    if (!__DEV__) {
+      const timer = setInterval(async () => {
+        const update = await Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          setUpdated(false);
+          await Updates.fetchUpdateAsync();
+          await Updates.reloadAsync();
+          setUpdated(true);
+        }
+      }, 3000);
+      return () => clearInterval(timer);
     }
-  }, [])
-  
+  }, []);
 
+  useEffect(() => {
+    onValue(ref(database, "IDCHimnos/himnos"), (snapshot) => {
+      const data = snapshot.val();
+      setFireData(data);
+    });
+
+    return () => {};
+  }, []);
 
   const searchData = () => {
-    const searchLowerCase = search.toLowerCase()
-    var arrayFilter = []
+    const searchLowerCase = search.toLowerCase();
+    var arrayFilter = [];
 
-      if(parseInt(searchLowerCase)) {
-        fireData.map((hymn) => {
-          if(hymn.number.includes(searchLowerCase)){
-            arrayFilter.push(hymn)
-          }
-        })
-      } else if(searchLowerCase.length > 2) {
-        if(searchLowerCase.includes(' ')){
-          fireData.map((hymn) => {
-            if(hymn.title.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(searchLowerCase.normalize("NFD").replace(/[\u0300-\u036f]/g, "")) ){
-              arrayFilter.push(hymn)
-            }
-          })
-   
-        } else { 
-          fireData.map((hymn) => {
-            var title = hymn.title.toLowerCase()
-
-            var bod = hymn.body.replace(/I|II|II|IV|V|coro|Coro|(Se Repite)|\.|\,|\¡|\!/g,'').replace(/\s+/gm, ' ').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(' ')
-            // console.log( title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(searchLowerCase) );
-            
-            if(title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(searchLowerCase) || bod.includes(searchLowerCase)){
-              arrayFilter.push(hymn)
-            }
-            
-          })
+    if (parseInt(searchLowerCase)) {
+      fireData.map((hymn) => {
+        if (hymn.number.includes(searchLowerCase)) {
+          arrayFilter.push(hymn);
         }
-  
+      });
+    } else if (searchLowerCase.length > 2) {
+      if (searchLowerCase.includes(" ")) {
+        fireData.map((hymn) => {
+          if (
+            hymn.title
+              .toLowerCase()
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .includes(
+                searchLowerCase.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+              )
+          ) {
+            arrayFilter.push(hymn);
+          }
+        });
+      } else {
+        fireData.map((hymn) => {
+          var title = hymn.title.toLowerCase();
+
+          var bod = hymn.body
+            .replace(/I|II|II|IV|V|coro|Coro|(Se Repite)|\.|\,|\¡|\!/g, "")
+            .replace(/\s+/gm, " ")
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .split(" ");
+          // console.log( title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(searchLowerCase) );
+
+          if (
+            title
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .includes(searchLowerCase) ||
+            bod.includes(searchLowerCase)
+          ) {
+            arrayFilter.push(hymn);
+          }
+        });
       }
+    }
 
-      return arrayFilter  
-  }
+    return arrayFilter;
+  };
 
-  return (
-    !updated ?
-    <View style={{
-      flex:1,
-      justifyContent:'center'
-    }}>
-      <ActivityIndicator color="white" size="large"/>
+  return !updated ? (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+      }}
+    >
+      <ActivityIndicator color="white" size="large" />
     </View>
-    :
+  ) : (
     <SafeAreaView style={AndroidSafeArea}>
       <Header
         search={search}
@@ -102,7 +124,7 @@ const Main = ( props) => {
       />
       <List
         {...props}
-        data={searchData().length > 0 ?  searchData() : fireData}
+        data={searchData().length > 0 ? searchData() : fireData}
         setModalVisible={setModalVisible}
       />
       <Modal transparent={true} animationType="slide" visible={modalVisible}>
@@ -111,7 +133,7 @@ const Main = ( props) => {
           data={fireData}
           setModalVisible={setModalVisible}
         />
-      </Modal> 
+      </Modal>
     </SafeAreaView>
   );
 };
