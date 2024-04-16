@@ -43,7 +43,7 @@ const Main = (props) => {
   }, []);
 
   useEffect(() => {
-    onValue(ref(database, "IDCHimnos/himnos"), (snapshot) => {
+    onValue(ref(database, "himnos"), (snapshot) => {
       const data = snapshot.val();
       setFireData(data);
     });

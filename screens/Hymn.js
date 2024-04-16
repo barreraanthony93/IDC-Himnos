@@ -17,7 +17,6 @@ import PlayingBars from "../components/AudioPlayer/PlayingBars";
 import FavButton from "../components/FavButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
 const Hymn = ({
   playerVisible,
   favs,
@@ -29,69 +28,68 @@ const Hymn = ({
   hymnPlaying,
   route: {
     params,
-    params: { title, body, number },
+    params: { title, body, number, blocks },
   },
 }) => {
   const [fontSizeAdjust, setfontSizeAdjust] = useState(20);
 
   useEffect(() => {
     async function asyncFunction() {
-      const fontSize = await AsyncStorage.getItem('fontSize');
+      const fontSize = await AsyncStorage.getItem("fontSize");
       if (fontSize !== null) {
-        setfontSizeAdjust(parseInt(fontSize))
+        setfontSizeAdjust(parseInt(fontSize));
       }
     }
-    asyncFunction()
+    asyncFunction();
 
-    return () => { }
-  }, [])
+    return () => {};
+  }, []);
 
   const fontSizeChange = async (adjust) => {
     if (adjust) {
-      if (fontSizeAdjust < 32) {
+      if (fontSizeAdjust < 42) {
         setfontSizeAdjust(fontSizeAdjust + 2);
-        await AsyncStorage.setItem('fontSize', (fontSizeAdjust + 2).toString());
+        await AsyncStorage.setItem("fontSize", (fontSizeAdjust + 2).toString());
       }
     } else {
       if (fontSizeAdjust > 12) {
         setfontSizeAdjust(fontSizeAdjust - 2);
-        await AsyncStorage.setItem('fontSize', (fontSizeAdjust - 2).toString());
+        await AsyncStorage.setItem("fontSize", (fontSizeAdjust - 2).toString());
       }
     }
   };
 
   const playAudio = () => {
-    loadNewPlaybackInstance(params)
+    loadNewPlaybackInstance(params);
 
     if (hymnPlaying == null) {
       updateState({
         playerVisible: !playerVisible,
-      })
-
+      });
     }
-  }
+  };
+
+  console.log(blocks);
 
   const renderPlayButton = () => {
-
     if (loadingPlayer) {
-      return <ActivityIndicator size='small' color={theme.colors.text} />
-    }
-    else if (playerVisible && hymnPlaying) {
+      return <ActivityIndicator size="small" color={theme.colors.text} />;
+    } else if (playerVisible && hymnPlaying) {
       if (hymnPlaying.number === number) {
-        return <PlayingBars />
+        return <PlayingBars />;
       } else {
-        return <Feather name="play" color={theme.colors.text} size={18} />
+        return <Feather name="play" color={theme.colors.text} size={18} />;
       }
     } else {
-      return <Feather name="play" color={theme.colors.text} size={18} />
+      return <Feather name="play" color={theme.colors.text} size={18} />;
     }
-  }
+  };
 
-  const buttonSize = 20
+  const buttonSize = 20;
   const AndroidSafeArea = {
     flex: 1,
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0
-  }
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+  };
   return (
     <SafeAreaView style={AndroidSafeArea}>
       <View style={styles.header}>
@@ -101,21 +99,33 @@ const Hymn = ({
             onPress={() => navigation.goBack()}
           >
             <>
-              <Feather name="arrow-left" color={theme.colors.text} size={buttonSize} />
+              <Feather
+                name="arrow-left"
+                color={theme.colors.text}
+                size={buttonSize}
+              />
             </>
           </TouchableOpacity>
         </View>
         <View style={styles.headerDetails}>
           <Text style={[styles.text, styles.number]}>{number} </Text>
-          <Text adjustsFontSizeToFit numberOfLines={1} style={[styles.text, styles.title]}>{title}</Text>
+          <Text
+            adjustsFontSizeToFit
+            numberOfLines={1}
+            style={[styles.text, styles.title]}
+          >
+            {title}
+          </Text>
         </View>
         <View style={styles.buttons}>
-          {audioStatus && <TouchableOpacity
-            style={theme.button}
-            onPress={() => [playAudio()]}
-          >
-            {renderPlayButton()}
-          </TouchableOpacity>}
+          {audioStatus && (
+            <TouchableOpacity
+              style={theme.button}
+              onPress={() => [playAudio()]}
+            >
+              {renderPlayButton()}
+            </TouchableOpacity>
+          )}
 
           <FavButton favs={favs} number={number} updateState={updateState} />
         </View>
@@ -123,18 +133,28 @@ const Hymn = ({
       <ScrollView
         contentContainerStyle={{
           paddingBottom: 70,
+          paddingHorizontal: 10,
         }}
       >
-        <Text
-          style={[
-            styles.body,
-            {
-              fontSize: fontSizeAdjust,
-            },
-          ]}
-        >
-          {body.replace(/\\n/g, "\n")}
-        </Text>
+        {blocks.map((block, i) => {
+          return (
+            i > 0 && (
+              <Text
+                key={i}
+                style={[
+                  styles.body,
+                  {
+                    fontWeight: block.type == "header" ? "700" : "400",
+                    fontSize: fontSizeAdjust,
+                    marginVertical: 10,
+                  },
+                ]}
+              >
+                {block.data.text}
+              </Text>
+            )
+          );
+        })}
       </ScrollView>
       <View style={styles.fontButtons}>
         <TouchableOpacity
@@ -161,21 +181,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
   },
   headerDetails: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 20,
-    width: '70%'
+    width: "70%",
   },
   leftSide: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   number: {
-    fontSize: 18
+    fontSize: 18,
   },
   title: {
     // paddingTop: 0,
@@ -183,14 +203,14 @@ const styles = StyleSheet.create({
   },
   buttons: {
     flexDirection: "row",
-    alignItems: 'center',
-    flexDirection: 'row'
+    alignItems: "center",
+    flexDirection: "row",
   },
   fontButtons: {
-    position: 'absolute',
-    flexDirection: 'row',
-    bottom: '2%',
-    right: '2%'
+    position: "absolute",
+    flexDirection: "row",
+    bottom: "2%",
+    right: "2%",
   },
 
   text: {
