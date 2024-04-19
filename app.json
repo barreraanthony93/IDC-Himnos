@@ -2,7 +2,7 @@
   "expo": {
     "name": "IDCHimnos",
     "slug": "IDCHimnos",
-    "version": "2.0.3",
+    "version": "2.0.5",
     "orientation": "portrait",
     "icon": "./assets/icon-01.png",
     "userInterfaceStyle": "light",
@@ -19,14 +19,14 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.iglesiadecristoenelgin.idchimnos",
-      "buildNumber": "2.0.3",
+      "buildNumber": "2.0.5",
       "config": {
         "usesNonExemptEncryption": false
       }
     },
     "android": {
       "package": "com.iglesiadecristoenelgin.idchimnos",
-      "versionCode": 6,
+      "versionCode": 13,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#121838"

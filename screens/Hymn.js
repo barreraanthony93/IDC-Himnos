@@ -8,6 +8,7 @@ import {
   Platform,
   StatusBar,
   ActivityIndicator,
+  Dimensions,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import theme from "../theme";
@@ -17,6 +18,7 @@ import PlayingBars from "../components/AudioPlayer/PlayingBars";
 import FavButton from "../components/FavButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+const { width } = Dimensions.get("screen");
 const Hymn = ({
   playerVisible,
   favs,
@@ -137,10 +139,59 @@ const Hymn = ({
         }}
       >
         {blocks.map((block, i) => {
-          return (
-            i > 0 && (
+          return i > 0 ? (
+            block.data.cols ? (
+              <View
+                key={block.id}
+                style={{
+                  width: width,
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-evenly",
+                }}
+              >
+                {block.data.cols.map((col, j) => {
+                  return (
+                    <View
+                      key={block.id + j}
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                      }}
+                    >
+                      {col.blocks.map((v) => {
+                        const hasItalic = v.data.text.includes("<i>");
+                        const hasBold = v.data.text.includes("<b>");
+                        const textConvert =
+                          hasItalic || hasBold
+                            ? v.data.text.replace(/<[^>]*>/g, "")
+                            : v.data.text;
+                        return (
+                          <Text
+                            key={v.id}
+                            style={[
+                              styles.body,
+                              {
+                                fontStyle: hasItalic ? "italic" : "normal",
+                                fontWeight: hasBold ? "700" : "400",
+                                fontSize: fontSizeAdjust,
+                                // marginVertical: 10,
+                                width: width / 2.5,
+                                textAlign: "center",
+                              },
+                            ]}
+                          >
+                            {textConvert}
+                          </Text>
+                        );
+                      })}
+                    </View>
+                  );
+                })}
+              </View>
+            ) : (
               <Text
-                key={i}
+                key={block.id}
                 style={[
                   styles.body,
                   {
@@ -153,6 +204,8 @@ const Hymn = ({
                 {block.data.text}
               </Text>
             )
+          ) : (
+            <></>
           );
         })}
       </ScrollView>
