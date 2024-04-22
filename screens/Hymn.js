@@ -20,21 +20,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width } = Dimensions.get("screen");
 const Hymn = ({
-  playerVisible,
   favs,
-  loadingPlayer,
   navigation,
-  loadNewPlaybackInstance,
-  updateState,
-  audioStatus,
-  hymnPlaying,
   route: {
-    params,
-    params: { title, body, number, blocks },
+    params: { title, number, blocks, id },
   },
 }) => {
   const [fontSizeAdjust, setfontSizeAdjust] = useState(20);
-
   useEffect(() => {
     async function asyncFunction() {
       const fontSize = await AsyncStorage.getItem("fontSize");
@@ -61,31 +53,29 @@ const Hymn = ({
     }
   };
 
-  const playAudio = () => {
-    loadNewPlaybackInstance(params);
+  // const playAudio = () => {
+  //   loadNewPlaybackInstance(params);
 
-    if (hymnPlaying == null) {
-      updateState({
-        playerVisible: !playerVisible,
-      });
-    }
-  };
+  //   if (hymnPlaying == null) {
+  //     updateState({
+  //       playerVisible: !playerVisible,
+  //     });
+  //   }
+  // };
 
-  console.log(blocks);
-
-  const renderPlayButton = () => {
-    if (loadingPlayer) {
-      return <ActivityIndicator size="small" color={theme.colors.text} />;
-    } else if (playerVisible && hymnPlaying) {
-      if (hymnPlaying.number === number) {
-        return <PlayingBars />;
-      } else {
-        return <Feather name="play" color={theme.colors.text} size={18} />;
-      }
-    } else {
-      return <Feather name="play" color={theme.colors.text} size={18} />;
-    }
-  };
+  // const renderPlayButton = () => {
+  //   if (loadingPlayer) {
+  //     return <ActivityIndicator size="small" color={theme.colors.text} />;
+  //   } else if (playerVisible && hymnPlaying) {
+  //     if (hymnPlaying.number === number) {
+  //       return <PlayingBars />;
+  //     } else {
+  //       return <Feather name="play" color={theme.colors.text} size={18} />;
+  //     }
+  //   } else {
+  //     return <Feather name="play" color={theme.colors.text} size={18} />;
+  //   }
+  // };
 
   const buttonSize = 20;
   const AndroidSafeArea = {
@@ -120,16 +110,7 @@ const Hymn = ({
           </Text>
         </View>
         <View style={styles.buttons}>
-          {audioStatus && (
-            <TouchableOpacity
-              style={theme.button}
-              onPress={() => [playAudio()]}
-            >
-              {renderPlayButton()}
-            </TouchableOpacity>
-          )}
-
-          <FavButton favs={favs} number={number} updateState={updateState} />
+          <FavButton favs={favs} number={number} />
         </View>
       </View>
       <ScrollView
@@ -150,10 +131,10 @@ const Hymn = ({
                   justifyContent: "space-evenly",
                 }}
               >
-                {block.data.cols.map((col, j) => {
+                {/* {block.data.cols.map((col, j) => {
                   return (
                     <View
-                      key={block.id + j}
+                      key={j}
                       style={{
                         display: "flex",
                         flexDirection: "row",
@@ -187,7 +168,7 @@ const Hymn = ({
                       })}
                     </View>
                   );
-                })}
+                })} */}
               </View>
             ) : (
               <Text

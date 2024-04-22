@@ -1,39 +1,44 @@
-import { View, ScrollView } from "react-native";
-import React, { useState } from "react";
+import { View, ScrollView, FlatList, VirtualizedList } from "react-native";
+import React, { useCallback, useState } from "react";
 import ListItem from "./ListItem.js";
-const List = ( props) => {
-  // const [numLoaded, setNumLoaded] = useState(20);
-  const {data} = props
- 
-  const renderItem = (item, index) => (
-    <ListItem
-      key={index}
-      {...props}
-      data={item}
-    />
-  );
+const List = (props) => {
+  const [numLoaded, setNumLoaded] = useState(20);
+  const { data } = props;
 
-  // const loadMore = () => {
-  //   setNumLoaded(numLoaded + 20);
-  // };
+  // const renderItem = useCallback(
+  //   (item, index) => {
+  //     console.log(item.title);
+  //     return <ListItem key={item.title + index} {...props} data={item} />;
+  //   },
+  //   [props]
+  // );
+
+  const loadMore = () => {
+    setNumLoaded(numLoaded + 20);
+  };
 
   return (
     <View>
-      <ScrollView contentContainerStyle={{
-        paddingBottom: 150
-      }}>
-        {data && data.map((item, index) => (
-         item.title && renderItem(item, index)
-        ))}
-      </ScrollView>
-      {/* <FlatList
-        data={data ? data.slice(0, numLoaded) : null}
-        renderItem={renderItem}
-        initialNumToRender={20}
+      {/* <ScrollView
+        contentContainerStyle={{
+          paddingBottom: 150,
+        }}
+      >
+        {data &&
+          data.map((item, index) => (
+            <ListItem key={item.type + index} {...props} data={item} />
+          ))}
+      </ScrollView> */}
+      <FlatList
+        data={data}
+        renderItem={({ item }, index) => (
+          <ListItem key={item.type + index} {...props} data={item} />
+        )}
+        initialNumToRender={100}
         keyExtractor={(item, id) => id}
+        contentContainerStyle={{ paddingBottom: 150 }}
         onEndReached={loadMore}
-        onEndReachedThreshold={0}
-      /> */}
+      />
     </View>
   );
 };
