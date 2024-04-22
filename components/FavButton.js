@@ -1,44 +1,39 @@
 import { StyleSheet, TouchableOpacity } from "react-native";
-import React from "react";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useContext, useCallback, useMemo } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import theme from "../theme";
+import { AppContext } from "../context/AppContext";
 
-export default function FavButton({favs, updateState, number}) {
-  const changeFavs = async (num) => {
-    const isFav = await AsyncStorage.getItem(num);
-      try {
-      if (isFav) {
-        await AsyncStorage.removeItem(num);
-      } else {
-        await AsyncStorage.setItem(num, num);
-      }      
-      let newFavs = await AsyncStorage.getAllKeys()
-      updateState({favs: newFavs})
+export default function FavButton(props) {
+  const { number, type, title } = props;
+  const { favs, setFavs } = useContext(AppContext);
+  const isFav = favs.includes(number + type);
 
-    } catch (e) {}
-  };
-
-  const checkFavs = (num) => {
-    if (favs) {
-      return favs.some((hymn) => hymn === num);
+  const updateFavs = useCallback(async () => {
+    if (isFav) {
+      const newFavs = [...favs].filter((f) => f !== number + type);
+      setFavs(newFavs);
+    } else {
+      setFavs((favs) => [...favs, number + type]);
     }
-    return false;
-  };
+  }, [favs, isFav, number, setFavs, type]);
+
+  const checkFavs = useMemo(() => {
+    return isFav ? "heart" : "hearto";
+  }, [isFav]);
 
   return (
-    <TouchableOpacity style={styles.fav} onPress={() => changeFavs(number)}>
-      <AntDesign
-        color={theme.colors.text}
-        size={20}
-        name={checkFavs(number) ? "heart" : "hearto"}
-      />
+    <TouchableOpacity style={styles.fav} onPress={updateFavs}>
+      <AntDesign color={theme.colors.text} size={20} name={checkFavs} />
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   fav: {
-    paddingHorizontal: 10
-  }
+    padding: 8,
+    // backgroundColor: theme.colors.background,
+    borderRadius: 100,
+  },
 });

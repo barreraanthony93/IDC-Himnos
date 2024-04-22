@@ -1,58 +1,77 @@
-import { StyleSheet, Text,  TouchableOpacity, View } from "react-native";
-import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { memo } from "react";
 import theme from "../theme";
- import FavButton from "./FavButton";
+import FavButton from "./FavButton";
 import PlayingBars from "./AudioPlayer/PlayingBars";
+import { toProperCase } from "../utils";
+import { useNavigation } from "@react-navigation/native";
 
+const ListItem = (props) => {
+  const {
+    setModalVisible,
+    favs,
+    data: { title, number, type },
+    data,
+  } = props;
 
-const ListItem = ({  setModalVisible, hymnPlaying, updateState, favs, data: { title, number }, data,  navigation }) => {
+  const navigation = useNavigation();
+  const navigateHymn = () => {
+    setModalVisible(false);
+    return navigation.navigate("Hymn", data);
+  };
 
-    const navigateHymn = () => {
-      updateState({
-        hymnSelected: data,
-      })
-        setModalVisible(false)
-        return navigation.navigate("Hymn", data)
-    }
- 
   return (
-    <TouchableOpacity style={styles.item} onPress={navigateHymn}>
-        <>
-      <View style={styles.texts}>
-        <Text style={[styles.number, styles.text]}>{number}</Text>
-        <Text  style={[styles.title, styles.text]}>{title}</Text>
+    <TouchableOpacity onPress={navigateHymn}>
+      <View style={styles.item}>
+        <View style={styles.texts}>
+          <Text style={[styles.number, styles.text]}>{number}</Text>
+          <View style={{ width: "90%", justifyContent: "center" }}>
+            <Text style={[styles.type]}>{type}</Text>
+            <Text style={[styles.title, styles.text]}>
+              {toProperCase(title)}
+            </Text>
+          </View>
+        </View>
+        {/* {hymnPlaying && hymnPlaying.number === number && <PlayingBars />} */}
+        <FavButton favs={favs} {...data} />
       </View>
-      {hymnPlaying && hymnPlaying.number === number && <PlayingBars/>}
-      <FavButton updateState={updateState} favs={favs} number={number}/>
-        </>
     </TouchableOpacity>
   );
 };
 
-export default ListItem;
+export default memo(ListItem);
 
 const styles = StyleSheet.create({
   item: {
     backgroundColor: theme.colors.dark,
-    padding: 10,
+    padding: 5,
+    paddingHorizontal: 10,
     margin: 5,
     borderRadius: 100,
     flexDirection: "row",
-
+    alignItems: "center",
   },
-  texts : {
+  texts: {
     flexDirection: "row",
     flex: 1,
+    alignContent: "center",
   },
   number: {
-    opacity: 0.5,
+    opacity: 0.7,
     fontWeight: "700",
-    paddingRight: 5,
-    fontSize: 16
-
+    paddingRight: 10,
+    paddingTop: 3,
+    fontSize: 16,
   },
-  title : {
-    width: '90%'
+  type: {
+    marginTop: -3,
+    fontSize: 10,
+    opacity: 0.5,
+    color: theme.colors.text,
+  },
+  title: {
+    width: "100%",
+    fontWeight: 600,
   },
   text: {
     color: theme.colors.text,

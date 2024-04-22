@@ -11,6 +11,7 @@ import { Audio, InterruptionModeIOS, InterruptionModeAndroid } from "expo-av";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ref, onValue } from "firebase/database";
 import { database } from "./database/firebaseConfig";
+import { AppWrapper } from "./context/AppContext";
 
 const Stack = createNativeStackNavigator();
 
@@ -24,110 +25,102 @@ const MyTheme = {
 
 export default class App extends Component {
   state = {
-    playerVisible: false,
-    hymnSelected: null,
-    hymnPlaying: null,
-    isPlaying: false,
-    audioStatus: null,
-    isBuffering: false,
-    playbackInstancePosition: null,
-    playbackInstanceDuration: null,
-    favs: null,
-    playbackInstance: null,
-    loadingPlayer: false,
+    // playerVisible: false,
+    // hymnSelected: null,
+    // hymnPlaying: null,
+    // isPlaying: false,
+    // audioStatus: null,
+    // isBuffering: false,
+    // playbackInstancePosition: null,
+    // playbackInstanceDuration: null,
+    // playbackInstance: null,
+    // loadingPlayer: false,
   };
   loading = false;
-  isSeeking = false;
+  // isSeeking = false;
 
   componentDidMount() {
-    Audio.setAudioModeAsync({
-      allowsRecordingIOS: false,
-      staysActiveInBackground: false,
-      interruptionModeIOS: InterruptionModeIOS.DoNotMix,
-      playsInSilentModeIOS: true,
-      shouldDuckAndroid: true,
-      interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
-      playThroughEarpieceAndroid: false,
-    });
-
-    onValue(ref(database, 'IDCHimnos/audio'), (snapshot) => {
-      const value = snapshot.val()
-      this.setState({audioStatus: value})
-    })
-
-    AsyncStorage.getAllKeys().then((favs) => {
-      if (favs) {
-        this.setState({ favs });
-      }
-    });
+    //   Audio.setAudioModeAsync({
+    //     allowsRecordingIOS: false,
+    //     staysActiveInBackground: false,
+    //     interruptionModeIOS: InterruptionModeIOS.DoNotMix,
+    //     playsInSilentModeIOS: true,
+    //     shouldDuckAndroid: true,
+    //     interruptionModeAndroid: InterruptionModeAndroid.DoNotMix,
+    //     playThroughEarpieceAndroid: false,
+    //   });
+    //   onValue(ref(database, 'IDCHimnos/audio'), (snapshot) => {
+    //     const value = snapshot.val()
+    //     this.setState({audioStatus: value})
+    //   })
   }
 
-  componentWillUnmount() {
-    if (this.state.playbackInstance != null)
-      this.state.playbackInstance.unloadAsync();
-  }
+  // componentWillUnmount() {
+  //   if (this.state.playbackInstance != null)
+  //     this.state.playbackInstance.unloadAsync();
+  // }
 
-  async loadNewPlaybackInstance(hymn) {
-    this.setState({
-      loadingPlayer: true
-    })
+  // async loadNewPlaybackInstance(hymn) {
+  //   this.setState({
+  //     loadingPlayer: true
+  //   })
 
-    if (this.state.playbackInstance != null) {
-      await this.state.playbackInstance.unloadAsync();
-      this.state.playbackInstance.setOnPlaybackStatusUpdate(null);
-      this.state.playbackInstance = null;
-    }
+  //   if (this.state.playbackInstance != null) {
+  //     await this.state.playbackInstance.unloadAsync();
+  //     this.state.playbackInstance.setOnPlaybackStatusUpdate(null);
+  //     this.state.playbackInstance = null;
+  //   }
 
-    const source = {
-      uri: "https://firebasestorage.googleapis.com/v0/b/idcauth.appspot.com/o/himnos%2Fhimno_0.wav?alt=media&token=7a6a52e0-cce7-43eb-a6e8-bd84a29e995a",
-    };
+  //   const source = {
+  //     uri: "https://firebasestorage.googleapis.com/v0/b/idcauth.appspot.com/o/himnos%2Fhimno_0.wav?alt=media&token=7a6a52e0-cce7-43eb-a6e8-bd84a29e995a",
+  //   };
 
-    const initialStatus = {
-      shouldPlay: true,
-      rate: 1.0,
-      volume: 0.5,
-    };
+  //   const initialStatus = {
+  //     shouldPlay: true,
+  //     rate: 1.0,
+  //     volume: 0.5,
+  //   };
 
-    const { sound, status } = await Audio.Sound.createAsync(
-      source,
-      initialStatus,
-      this.onPlaybackStatusUpdate
-    );
-    this.setState({ playing: true, playbackInstance: sound, loadingPlayer: false, hymnPlaying: hymn });
-  }
+  //   const { sound, status } = await Audio.Sound.createAsync(
+  //     source,
+  //     initialStatus,
+  //     this.onPlaybackStatusUpdate
+  //   );
+  //   this.setState({ playing: true, playbackInstance: sound, loadingPlayer: false, hymnPlaying: hymn });
+  // }
 
-  onPlaybackStatusUpdate = (status) => {
-    if (status.isLoaded) {
-      this.setState({
-        isBuffering: status.isBuffering,
-        isPlaying: status.isPlaying,
-        playbackInstancePosition: status.positionMillis,
-        playbackInstanceDuration: status.durationMillis,
-      });
-      if (status.didJustFinish) {
-      }
-    } else {
-      if (status.error) {
-        console.log(`FATAL PLAYER ERROR: ${status.error}`);
-      }
-    }
-  };
+  // onPlaybackStatusUpdate = (status) => {
+  //   if (status.isLoaded) {
+  //     this.setState({
+  //       isBuffering: status.isBuffering,
+  //       isPlaying: status.isPlaying,
+  //       playbackInstancePosition: status.positionMillis,
+  //       playbackInstanceDuration: status.durationMillis,
+  //     });
+  //     if (status.didJustFinish) {
+  //     }
+  //   } else {
+  //     if (status.error) {
+  //       console.log(`FATAL PLAYER ERROR: ${status.error}`);
+  //     }
+  //   }
+  // };
 
-  updateState = (state) => {
-    this.setState((prev) => ({
-      ...prev,
-      ...state
-    }));
-  };
+  // updateState = (state) => {
+  //   this.setState((prev) => ({
+  //     ...prev,
+  //     ...state
+  //   }));
+  // };
 
   render() {
-    const slider =
-      (this.state.playbackInstancePosition /
-        this.state.playbackInstanceDuration) *
-      100;
+    // const slider =
+    //   (this.state.playbackInstancePosition /
+    //     this.state.playbackInstanceDuration) *
+    //   100;
 
     return (
-      <>
+      <AppWrapper>
         <NavigationContainer theme={MyTheme} style={styles.container}>
           <StatusBar style="light" />
           <Stack.Navigator>
@@ -142,7 +135,7 @@ export default class App extends Component {
                   {...props}
                   {...this.props}
                   {...this.state}
-                  updateState={this.updateState}
+                  // updateState={this.updateState}
                 />
               )}
             </Stack.Screen>
@@ -156,8 +149,8 @@ export default class App extends Component {
                 <HymnScreen
                   {...this.props}
                   {...this.state}
-                  loadNewPlaybackInstance={(hymn) => this.loadNewPlaybackInstance(hymn)}
-                  updateState={this.updateState}
+                  // loadNewPlaybackInstance={(hymn) => this.loadNewPlaybackInstance(hymn)}
+                  // updateState={this.updateState}
                   {...props}
                 />
               )}
@@ -169,7 +162,7 @@ export default class App extends Component {
           {...this.state}
           updateState={this.updateState}
         /> */}
-      </>
+      </AppWrapper>
     );
   }
 }

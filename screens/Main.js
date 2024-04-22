@@ -1,32 +1,45 @@
 import {
   View,
   Text,
+  Animated,
   ActivityIndicator,
   Platform,
   StatusBar,
   SafeAreaView,
   Modal,
+  Dimensions,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import List from "../components/List";
 import Header from "../components/Header";
 import FavModal from "../components/FavModal";
+import SearchModal from "../components/SearchModal";
 // import { data } from "../database/himnos.js";
 // import data from "../database/himnos.json";
 import { ref, onValue } from "firebase/database";
 import { database } from "../database/firebaseConfig";
 import * as Updates from "expo-updates";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Tabs from "../components/Tabs";
+
+const { width } = Dimensions.get("screen");
 
 const Main = (props) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [search, setSearch] = useState("");
-  const [fireData, setFireData] = useState(null);
+  const [searchModal, setSearchModal] = useState(false);
+  const [himnos, setHimnos] = useState(null);
+  const [cantos, setCantos] = useState(null);
   const [updated, setUpdated] = useState(true);
+  const [active, setActive] = useState(0);
+  const [activeData, setActiveData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const slideOver = useRef(new Animated.Value(0)).current;
 
   const AndroidSafeArea = {
     flex: 1,
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   };
+
   useEffect(() => {
     if (!__DEV__) {
       const timer = setInterval(async () => {
@@ -43,69 +56,44 @@ const Main = (props) => {
   }, []);
 
   useEffect(() => {
+    setLoading(true);
+    setTimeout(() => {
+      setActiveData(active == 0 ? cantos : himnos);
+      setLoading(false);
+    }, 200);
+  }, [active]);
+
+  useEffect(() => {
     onValue(ref(database, "himnos"), (snapshot) => {
       const data = snapshot.val();
-      setFireData(data);
+      setHimnos(data);
+      setActiveData(data);
+    });
+    onValue(ref(database, "canticos"), (snapshot) => {
+      const data = snapshot.val();
+      setCantos(data);
     });
 
     return () => {};
   }, []);
 
-  const searchData = () => {
-    const searchLowerCase = search.toLowerCase();
-    var arrayFilter = [];
-
-    if (parseInt(searchLowerCase)) {
-      fireData.map((hymn) => {
-        if (hymn.number.includes(searchLowerCase)) {
-          arrayFilter.push(hymn);
-        }
-      });
-    } else if (searchLowerCase.length > 2) {
-      if (searchLowerCase.includes(" ")) {
-        fireData.map((hymn) => {
-          if (
-            hymn.title
-              .toLowerCase()
-              .normalize("NFD")
-              .replace(/[\u0300-\u036f]/g, "")
-              .includes(
-                searchLowerCase.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-              )
-          ) {
-            arrayFilter.push(hymn);
-          }
-        });
-      } else {
-        fireData.map((hymn) => {
-          var title = hymn.title.toLowerCase();
-
-          var bod = hymn.body
-            .replace(/I|II|II|IV|V|coro|Coro|(Se Repite)|\.|\,|\¡|\!/g, "")
-            .replace(/\s+/gm, " ")
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .split(" ");
-          // console.log( title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").includes(searchLowerCase) );
-
-          if (
-            title
-              .normalize("NFD")
-              .replace(/[\u0300-\u036f]/g, "")
-              .includes(searchLowerCase) ||
-            bod.includes(searchLowerCase)
-          ) {
-            arrayFilter.push(hymn);
-          }
-        });
-      }
+  useEffect(() => {
+    if (active == 1) {
+      Animated.timing(slideOver, {
+        toValue: -width,
+        duration: 200,
+        useNativeDriver: false,
+      }).start();
+    } else {
+      Animated.timing(slideOver, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: false,
+      }).start();
     }
+  }, [active]);
 
-    return arrayFilter;
-  };
-
-  return !updated ? (
+  return !updated || !cantos ? (
     <View
       style={{
         flex: 1,
@@ -117,23 +105,76 @@ const Main = (props) => {
   ) : (
     <SafeAreaView style={AndroidSafeArea}>
       <Header
-        search={search}
-        setSearch={setSearch}
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
+        setSearchModal={setSearchModal}
+        active={active}
       />
-      <List
-        {...props}
-        data={searchData().length > 0 ? searchData() : fireData}
-        setModalVisible={setModalVisible}
-      />
-      <Modal transparent={true} animationType="slide" visible={modalVisible}>
-        <FavModal
-          {...props}
-          data={fireData}
-          setModalVisible={setModalVisible}
+
+      {cantos && himnos ? (
+        <Animated.View
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            transform: [{ translateX: slideOver }],
+          }}
+        >
+          <View
+            style={{
+              width,
+            }}
+          >
+            <List data={cantos} setModalVisible={setModalVisible} />
+          </View>
+          <View
+            style={{
+              width,
+            }}
+          >
+            <List data={himnos} setModalVisible={setModalVisible} />
+          </View>
+        </Animated.View>
+      ) : (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator color="white" size="large" />
+        </View>
+      )}
+      {cantos && himnos && (
+        <>
+          <Modal transparent={true} animationType="slide" visible={searchModal}>
+            <SearchModal
+              data={[...cantos, ...himnos]}
+              setSearchModal={setSearchModal}
+            />
+          </Modal>
+          <Modal
+            transparent={true}
+            animationType="slide"
+            visible={modalVisible}
+          >
+            <FavModal
+              data={[...cantos, ...himnos]}
+              setModalVisible={setModalVisible}
+            />
+          </Modal>
+        </>
+      )}
+      <View
+        style={{
+          position: "absolute",
+          bottom: 25,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Tabs
+          active={active}
+          setActive={setActive}
+          tabs={["Canticos", "Himnos"]}
         />
-      </Modal>
+      </View>
     </SafeAreaView>
   );
 };
