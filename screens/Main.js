@@ -78,7 +78,7 @@ const Main = (props) => {
   }, []);
 
   useEffect(() => {
-    if (active == 1) {
+    if (active == 1 && Platform.OS == "ios") {
       Animated.timing(slideOver, {
         toValue: -width,
         duration: 200,
@@ -112,28 +112,40 @@ const Main = (props) => {
       />
 
       {cantos && himnos ? (
-        <Animated.View
-          style={{
-            flex: 1,
-            flexDirection: "row",
-            transform: [{ translateX: slideOver }],
-          }}
-        >
-          <View
+        Platform.OS === "ios" ? (
+          <Animated.View
             style={{
-              width,
+              flexDirection: "row",
+              transform: [{ translateX: slideOver }],
             }}
           >
-            <List data={cantos} setModalVisible={setModalVisible} />
-          </View>
+            <View
+              style={{
+                width,
+              }}
+            >
+              <List data={cantos} setModalVisible={setModalVisible} />
+            </View>
+            <View
+              style={{
+                width,
+              }}
+            >
+              <List data={himnos} setModalVisible={setModalVisible} />
+            </View>
+          </Animated.View>
+        ) : (
           <View
             style={{
-              width,
+              flexDirection: "row",
             }}
           >
-            <List data={himnos} setModalVisible={setModalVisible} />
+            <List
+              data={active == 1 ? himnos : cantos}
+              setModalVisible={setModalVisible}
+            />
           </View>
-        </Animated.View>
+        )
       ) : (
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}

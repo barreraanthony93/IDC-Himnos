@@ -1,4 +1,4 @@
-import { View, ScrollView, FlatList, VirtualizedList } from "react-native";
+import { View, ScrollView, FlatList, Platform } from "react-native";
 import React, { useCallback, useState } from "react";
 import ListItem from "./ListItem.js";
 const List = (props) => {
@@ -17,29 +17,28 @@ const List = (props) => {
     setNumLoaded(numLoaded + 20);
   };
 
-  return (
-    <View>
-      {/* <ScrollView
-        contentContainerStyle={{
-          paddingBottom: 150,
-        }}
-      >
-        {data &&
-          data.map((item, index) => (
-            <ListItem key={item.type + index} {...props} data={item} />
-          ))}
-      </ScrollView> */}
-      <FlatList
-        data={data}
-        renderItem={({ item }, index) => (
+  return Platform.OS === "android" ? (
+    <ScrollView
+      contentContainerStyle={{
+        paddingBottom: 150,
+      }}
+    >
+      {data &&
+        data.map((item, index) => (
           <ListItem key={item.type + index} {...props} data={item} />
-        )}
-        initialNumToRender={100}
-        keyExtractor={(item, id) => id}
-        contentContainerStyle={{ paddingBottom: 150 }}
-        onEndReached={loadMore}
-      />
-    </View>
+        ))}
+    </ScrollView>
+  ) : (
+    <FlatList
+      data={data}
+      renderItem={({ item }, index) => (
+        <ListItem key={item.type + index} {...props} data={item} />
+      )}
+      initialNumToRender={100}
+      keyExtractor={(item, id) => id}
+      contentContainerStyle={{ paddingBottom: 150 }}
+      onEndReached={loadMore}
+    />
   );
 };
 
